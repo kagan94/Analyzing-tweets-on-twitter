@@ -23,23 +23,25 @@ def get_tweets(filename, load_existing=True, cursor_obj=None):
 
         print('start fetching tweets...')
         tweets, iter_num = [], 0
-        while True:
-            try:
-                tweet = cursor_obj.next()
-                tweets.append(tweet)
+        try:
+            while True:
+                try:
+                    tweet = cursor_obj.next()
+                    tweets.append(tweet)
 
-                iter_num += 1
-                print(iter_num)
-            except tweepy.TweepError:
-                print('error')
-                time.sleep(60*15)
-                continue
-            except StopIteration:
-                break
-
-        # Save tweets to file
-        tweets_json = [tweet._json for tweet in tweets]
-        save_to_file(filename, tweets_json)
+                    iter_num += 1
+                    print(iter_num)
+                except tweepy.TweepError as e:
+                    print('error')
+                    print(str(e))
+                    time.sleep(60*15)
+                    continue
+                except StopIteration:
+                    break
+        finally:
+            # Save tweets to file
+            tweets_json = [tweet._json for tweet in tweets]
+            save_to_file(filename, tweets_json)
 
     # Read tweets from file
     tweets = read_from_file(filename)
